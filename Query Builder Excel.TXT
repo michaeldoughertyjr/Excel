@@ -1,0 +1,140 @@
+
+--CODE LOOKUP
+=IF(
+	RIGHT([@[COLUMN_NAME]], 3) = "_CD"
+	,IFERROR(
+		CHAR(9)&"LEFT JOIN" &
+		CHAR(10)&CHAR(9)&CHAR(9)&"("&
+		CHAR(10)&CHAR(9)&CHAR(9)&"SELECT"&
+		CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&
+			LEFT([@[column_name]], LEN([@[column_name]])-3)&".CODE_VALUE, "&
+			LEFT([@[column_name]], LEN([@[column_name]])-3)&".DISPLAY"&
+		CHAR(10)&CHAR(9)&CHAR(9)&"FROM SETON_P3291.CODE_VALUE AS "&
+			LEFT([@[column_name]], LEN([@[column_name]])-3)&
+		CHAR(10)&CHAR(9)&CHAR(9)& ")" & " AS " &
+			LEFT([@[column_name]], LEN([@[column_name]])-3) &
+		CHAR(10)&CHAR(9)&CHAR(9)& "ON "&
+			[@[table_name]]&"."&[@[column_name]]&" = " &
+			LEFT([@[column_name]], LEN([@[column_name]])-3)&".CODE_VALUE"
+		, ""
+		), 
+	IF(
+		OR(
+			RIGHT([@[column_name]], 8) = "PRSNL_ID" 
+			,RIGHT([@[column_name]], 12) = "PHYSICIAN_ID"
+			,RIGHT([@[column_name]], 5) = "BY_ID"
+			,RIGHT([@[column_name]], 5) = "IN_ID"
+			,RIGHT([@[column_name]], 6) = "DOC_ID"
+			,RIGHT([@[column_name]], 7) = "PHYS_ID"
+			,RIGHT([@[column_name]], 9) = "PERSON_ID"
+			)
+		,IFERROR(
+			CHAR(9)&"LEFT JOIN" &
+			CHAR(10)&CHAR(9)&CHAR(9)&"("&
+			CHAR(10)&CHAR(9)&CHAR(9)&"SELECT"&
+			CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&"DISTINCT "&
+				LEFT([@[column_name]], LEN([@[column_name]])-3)&".PRSNL_ID, "&
+			CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&"CASE"&
+			CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&"WHEN"&
+			CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&"("&
+			CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&
+				LEFT([@[column_name]], LEN([@[column_name]])-3)&".LAST_NAME <> ''"&
+			CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&"OR "&
+				LEFT([@[column_name]], LEN([@[column_name]])-3)&".FIRST_NAME <> ''"&
+			CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&")"&
+			CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&"THEN ("&
+				LEFT([@[column_name]], LEN([@[column_name]])-3)&".LAST_NAME||', '||"&
+				LEFT([@[column_name]], LEN([@[column_name]])-3)&".FIRST_NAME)"&
+			CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&"ELSE NULL"&
+			CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&"END AS "&
+				LEFT([@[column_name]], LEN([@[column_name]])-3)&"_NAME"&
+			CHAR(10)&CHAR(9)&CHAR(9)&" FROM SETON_ANALYST.CUST_PERSONNEL AS "&
+				LEFT([@[column_name]], LEN([@[column_name]])-3)&
+			CHAR(10)&CHAR(9)&CHAR(9)& ") "& "AS " &
+				LEFT([@[column_name]], LEN([@[column_name]])-3) &
+			CHAR(10)&CHAR(9)&CHAR(9)& "ON "&
+				[@[table_name]]&"."&[@[column_name]]&" = " &
+				LEFT([@[column_name]], LEN([@[column_name]])-3)&".PRSNL_ID", ""
+			), ""
+		)
+	)
+	
+--DATA CALL
+=IF(
+	RIGHT([@[column_name]], 3) = "_CD"
+	,IFERROR(
+		","&
+		LEFT([@[column_name]],LEN([@[column_name]])-3)&"."&"DISPLAY AS "& 
+		LEFT([@[column_name]],LEN([@[column_name]])-3), ""
+		)
+	,IF(
+		OR(
+			RIGHT([@[column_name]], 8) = "PRSNL_ID" 
+			,RIGHT([@[column_name]], 12) = "PHYSICIAN_ID"
+			,RIGHT([@[column_name]], 5) = "BY_ID"
+			,RIGHT([@[column_name]], 5) = "IN_ID"
+			,RIGHT([@[column_name]], 6) = "DOC_ID"
+			,RIGHT([@[column_name]], 7) = "PHYS_ID"
+			,RIGHT([@[column_name]], 9) = "PERSON_ID"
+			
+			)
+		,IFERROR(
+			","&
+			LEFT([@[column_name]], LEN([@[column_name]])-3)&"."&
+			LEFT([@[column_name]], LEN([@[column_name]])-3)&"_NAME AS "& 
+			LEFT([@[column_name]], LEN([@[column_name]])-3)&"_NAME", ""
+			)
+		,IF(
+			RIGHT([@[column_name]], 6) = "_DT_TM"
+			,IFERROR(",TO_CHAR("&[@[table_name]]&"."&[@[column_name]]&"
+			,'MM/DD/YYYY HH:MM:SS') 
+			AS "& [@[column_name]], ""),""
+			)
+		)
+	)
+	
+	
+--Query Builder
+
+="SELECT"&
+	CHAR(10)&CHAR(9)&
+	TEXTJOIN(
+		CHAR(10)&CHAR(9)
+		,TRUE
+		,IF(
+			Field_List[TABLE_NAME]='Query Builder'!F2
+			,Field_List[QUERY_BUILDER]
+			,TEXT(,)
+			)
+		)&
+	CHAR(10)&
+	"FROM "&"SETON_P3291"&"."&F2&
+	CHAR(10)&CHAR(9)&
+	TEXTJOIN(
+		CHAR(10)&CHAR(9)
+		,TRUE
+		,IF(
+			Field_List[TABLE_NAME]='Query Builder'!F2
+			,Field_List[JOIN_BUILDER]
+			,TEXT(,)
+			)
+		)&
+		CHAR(10)&CHAR(9)
+		
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

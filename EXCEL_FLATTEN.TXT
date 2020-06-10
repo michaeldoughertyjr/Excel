@@ -1,0 +1,33 @@
+=IF(
+	N2<>""
+	,CONCAT(
+		",LEFT"
+		&CHAR(10)&CHAR(9)&"("
+		&CHAR(10)&CHAR(9)&"REGEXP_REPLACE"
+		&CHAR(10)&CHAR(9)&CHAR(9)&"("
+		&CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)
+		,TEXTJOIN(
+			CONCAT(CHAR(10)&CHAR(9)&CHAR(9),"||","', '","||"),TRUE,IF(I$2:I$803=N2,L$2:L$803,"")
+				)
+		,CHAR(10)&CHAR(9)&CHAR(9)&",' ,'"
+		,CHAR(10)&CHAR(9)&CHAR(9)&",''"
+		,CHAR(10)&CHAR(9)&CHAR(9)&")"
+		,CHAR(10)&CHAR(9),",LENGTH"
+		&CHAR(10)&CHAR(9)&CHAR(9)&"("
+		&CHAR(10)&CHAR(9)&CHAR(9)&"REGEXP_REPLACE"
+		&CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&"("
+		&CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)&CHAR(9)
+		,TEXTJOIN(
+			CONCAT(CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9),"||","', '","||"),TRUE,IF(I$2:I$803=N2,L$2:L$803,"")
+				)
+		,CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&",' ,'"
+		,CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&",''"
+		,CHAR(10)&CHAR(9)&CHAR(9)&CHAR(9)&")"
+		,CHAR(10)&CHAR(9)&CHAR(9)&")"
+		&CHAR(10)&CHAR(9)&CHAR(9)&"-2"
+		&CHAR(10)&CHAR(9)&")"
+			)
+		&CHAR(10)&CHAR(9)&"AS "
+		&INDEX(C2:C29, MATCH(N2, A2:A29, 0))
+		&"_LIST"
+	,"")
